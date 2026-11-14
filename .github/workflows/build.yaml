@@ -93,10 +93,24 @@ jobs:
             --upgrade \
             --upgrade-strategy eager \
             -r requirements_dev.txt
-      
-      - name: Build and install Python packages
+
+      - name: Clean build outputs
         run: |
-          make PYTHON=python PYTHON_VENV=python clean pydist
+          make PYTHON=python PYTHON_VENV=python clean
+
+      - name: Install project and generate version module
+        run: python -m pip install --no-deps --no-build-isolation .
+
+      - name: Verify version module
+        run: |
+          python -c "from pathlib import Path; p = Path('comictaggerlib/ctversion.py'); assert p.is_file(), f'Missing generated file: {p}'"
+          python -c "from comictaggerlib import ctversion; print(ctversion.__file__)"
+
+      - name: Build and install Python packages
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          make PYTHON=python PYTHON_VENV=python pydist
 
           PACKAGE_NAME="$(python setup.py --fullname)"
 

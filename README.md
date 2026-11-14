@@ -1,4 +1,4 @@
-[![CI](https://github.com/nate-sheltry/comictagger/actions/workflows/build.yaml/badge.svg?branch=develop&event=push)](https://github.com/nate-sheltry/comictagger/actions/workflows/build.yaml)
+[![CI](https://github.com/nate-sheltry/comictagger/actions/workflows/build.yaml/badge.svg)](https://github.com/nate-sheltry/comictagger/actions/workflows/build.yaml)
 [![GitHub release (latest by date)](https://img.shields.io/github/downloads/nate-sheltry/comictagger/latest/total)](https://github.com/nate-sheltry/comictagger/releases/latest)
 [![PyPI - License](https://img.shields.io/pypi/l/comictagger)](https://opensource.org/licenses/Apache-2.0)
 # ComicTagger
