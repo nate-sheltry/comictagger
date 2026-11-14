@@ -2,7 +2,7 @@ beautifulsoup4>=4.1
 importlib_metadata>=3.3.0
 natsort>=8.1.0
 pathvalidate
-pillow>=9.1.0
+pillow>=13.0.0
 pycountry
 pyicu; sys_platform == 'linux' or sys_platform == 'darwin'
 rapidfuzz>=2.12.0
@@ -10,3 +10,5 @@ requests==2.*
 text2digits
 typing_extensions
 wordninja
+pillow_jxl_plugin>=1.3.8
+pillow_heif>=1.8.1
