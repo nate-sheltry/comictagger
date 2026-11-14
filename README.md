@@ -1,16 +1,6 @@
-[![CI](https://github.com/comictagger/comictagger/actions/workflows/build.yaml/badge.svg?branch=develop&event=push)](https://github.com/comictagger/comictagger/actions/workflows/build.yaml)
-[![GitHub release (latest by date)](https://img.shields.io/github/downloads/comictagger/comictagger/latest/total)](https://github.com/comictagger/comictagger/releases/latest)
-[![PyPI](https://img.shields.io/pypi/v/comictagger)](https://pypi.org/project/comictagger/)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/comictagger)](https://pypistats.org/packages/comictagger)
-[![Chocolatey package](https://img.shields.io/chocolatey/dt/comictagger?color=blue&label=chocolatey)](https://community.chocolatey.org/packages/comictagger)
+[![CI](https://github.com/nate-sheltry/comictagger/actions/workflows/build.yaml/badge.svg?branch=develop&event=push)](https://github.com/nate-sheltry/comictagger/actions/workflows/build.yaml)
+[![GitHub release (latest by date)](https://img.shields.io/github/downloads/nate-sheltry/comictagger/latest/total)](https://github.com/nate-sheltry/comictagger/releases/latest)
 [![PyPI - License](https://img.shields.io/pypi/l/comictagger)](https://opensource.org/licenses/Apache-2.0)
-
-[![GitHub Discussions](https://img.shields.io/github/discussions/comictagger/comictagger)](https://github.com/comictagger/comictagger/discussions)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/comictagger/community)
-[![Google Group](https://img.shields.io/badge/discuss-on%20groups-%23207de5)](https://groups.google.com/forum/#!forum/comictagger)
-[![Twitter](https://img.shields.io/badge/%40comictagger-twitter-lightgrey)](https://twitter.com/comictagger)
-[![Facebook](https://img.shields.io/badge/comictagger-facebook-lightgrey)](https://www.facebook.com/ComicTagger-139615369550787/)
-
 # ComicTagger
 
 ComicTagger is a **multi-platform** app for **writing metadata to digital comics**, written in Python and PyQt.
@@ -27,9 +17,14 @@ ComicTagger is a **multi-platform** app for **writing metadata to digital comics
 * Native full support for **CBZ** digital comics
 * Native read only support for **CBR** digital comics: full support enabled installing additional [rar tools](https://www.rarlab.com/download.htm)
 * Command line interface (CLI) enabling **custom scripting** and **batch operations on large collections**
+* Includes support for advanced image formats:
+    - *JPEG XL* **.jxl**
+    - *AVIF* **.avif**
+    - *HEIC & HEIF* **.heic**, **.heif**
 
 For details, screen-shots, and more, visit [the Wiki](https://github.com/comictagger/comictagger/wiki)
 
+For more information on why I forked and made some modification [click here](Q&A.md)
 
 ## Installation
 
@@ -57,7 +52,7 @@ choco install comictagger
 ```
 ### From source
 
- 1. Ensure you have python 3.9 installed
- 2. Clone this repository `git clone https://github.com/comictagger/comictagger.git`
+ 1. Ensure you have python 3.12 installed
+ 2. Clone this repository `git clone https://github.com/nate-sheltry/comictagger.git`
  3. `pip3 install -r requirements_dev.txt`
  7. `pip3 install .` or `pip3 install .[GUI]`
