@@ -1,1 +1,1 @@
-unrar-cffi>=0.2.2
+unrar2-cffi>=0.5.0
