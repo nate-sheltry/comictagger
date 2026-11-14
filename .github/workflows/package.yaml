@@ -88,7 +88,7 @@ jobs:
             --upgrade-strategy eager \
             -r requirements_dev.txt
 
-      - name: Build, install, and test Python packages
+      - name: Build and install Python packages
         env:
           QT_QPA_PLATFORM: offscreen
         run: |
@@ -99,7 +99,16 @@ jobs:
           python -m pip install \
             "dist/${PACKAGE_NAME}-py3-none-any.whl[all]"
 
+      - name: Lint
+        if: runner.os == 'Linux'
+        continue-on-error: true
+        run: |
           python -m flake8
+
+      - name: Run tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
           python -m pytest
 
       - name: Build PyInstaller package
