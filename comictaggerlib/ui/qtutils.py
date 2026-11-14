@@ -19,8 +19,8 @@ except ImportError:
 
 if qt_available:
     try:
-        from PIL import Image, ImageQt
-
+        from PIL import Image, ImageOps, ImageQt
+        import pillow_jxl
         pil_available = True
     except ImportError:
         pil_available = False
@@ -66,18 +66,31 @@ if qt_available:
 
     def get_qimage_from_data(image_data: bytes) -> QtGui.QImage:
         img = QtGui.QImage()
-        success = img.loadFromData(image_data)
-        if not success:
+        # First try Qt's installed image decoders.
+        if img.loadFromData(image_data):
+            return img
+        if pil_available:
             try:
-                if pil_available:
-                    # Qt doesn't understand the format, but maybe PIL does
-                    img = ImageQt.ImageQt(Image.open(io.BytesIO(image_data)))
-                    success = True
+                with Image.open(io.BytesIO(image_data)) as source:
+                    source.seek(0)
+                    rgba = ImageOps.exif_transpose(source).convert("RGBA")
+                    width, height = rgba.size
+                    pixels = rgba.tobytes("raw", "RGBA")
+                    img = QtGui.QImage(
+                        pixels,
+                        width,
+                        height,
+                        width * 4,
+                        QtGui.QImage.Format_RGBA8888,
+                    ).copy()
+                if not img.isNull():
+                    return img
             except Exception:
-                pass
+                logger.exception("Pillow failed to decode the page image.")
         # if still nothing, go with default image
-        if not success:
-            img.load(str(graphics_path / "nocover.png"))
+        img = QtGui.QImage()
+        if not img.load(str(graphics_path / "nocover.png")):
+            logger.error("Could not load fallback image")
         return img
 
     def qt_error(msg: str, e: Exception | None = None) -> None:

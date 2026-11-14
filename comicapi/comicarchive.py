@@ -944,7 +944,7 @@ class ComicArchive:
             self.page_list = []
             for name in files:
                 if (
-                    os.path.splitext(name)[1].casefold() in [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+                    os.path.splitext(name)[1].casefold() in [".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif", ".jxl", ".heic", ".heif", ".tif", ".tiff", ".bmp"]
                     and os.path.basename(name)[0] != "."
                 ):
                     self.page_list.append(name)
