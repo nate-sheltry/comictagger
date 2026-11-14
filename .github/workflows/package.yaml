@@ -89,8 +89,10 @@ jobs:
             -r requirements_dev.txt
 
       - name: Build, install, and test Python packages
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: |
-          make clean pydist
+          make PYTHON=python PYTHON_VENV=python clean pydist
 
           PACKAGE_NAME="$(python setup.py --fullname)"
 
@@ -101,8 +103,9 @@ jobs:
           python -m pytest
 
       - name: Build PyInstaller package
+        if: runner.os != 'Linux'
         run: |
-          make dist
+          make PYTHON=python PYTHON_VENV=python dist
 
       - name: List generated packages
         run: |
