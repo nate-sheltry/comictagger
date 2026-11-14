@@ -1,32 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 import platform
-from pathlib import Path
-import wordninja
 
 from comictaggerlib import ctversion
 
 enable_console = False
 block_cipher = None
 
-wordninja_words = (
-    Path(wordninja.__file__).resolve().parent
-    / "wordninja"
-    / "wordninja_words.txt.gz"
-)
-
-if not wordninja_words.is_file():
-    raise FileNotFoundError(
-        f"Missing wordninja data file in build environment: {wordninja_words}"
-    )
-
 a = Analysis(
     ["comictagger.py"],
     pathex=[],
     binaries=[],
-    datas=[
-        (str(wordninja_words), "wordninja")
-    ],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
