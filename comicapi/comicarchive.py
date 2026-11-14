@@ -38,6 +38,7 @@ from comicapi.genericmetadata import GenericMetadata, PageType
 
 try:
     import py7zr
+    from py7zr.io import BytesIOFactory
 
     z7_support = True
 except ImportError:
@@ -119,15 +120,32 @@ class SevenZipArchiver(UnknownArchiver):
         return False
 
     def read_file(self, archive_file: str) -> bytes:
-        data = b""
         try:
             with py7zr.SevenZipFile(self.path, "r") as zf:
-                data = zf.read(archive_file)[archive_file].read()
+                member = next(
+                    (
+                        member
+                        for member in zf.list()
+                        if member.filename == archive_file
+                        and not member.is_directory
+                    ),
+                    None
+                )
+                if member is None:
+                    raise KeyError(archive_file)
+                factory = BytesIOFactory(
+                    limit=(member.uncompressed or 0) + 1
+                )
+                zf.extract(
+                    targets=[archive_file],
+                    factory=factory,
+                )
+                buffer = factory.get(archive_file)
+                buffer.seek(0)
+                return buffer.read()
         except (py7zr.Bad7zFile, OSError) as e:
             logger.error("Error reading 7zip archive [%s]: %s :: %s", e, self.path, archive_file)
             raise
-
-        return data
 
     def remove_file(self, archive_file: str) -> bool:
         return self.rebuild([archive_file])
@@ -167,24 +185,47 @@ class SevenZipArchiver(UnknownArchiver):
         """
 
         try:
+            excluded = set(exclude_list)
             # py7zr treats all archives as if they used solid compression
             # so we need to get the filename list first to read all the files at once
             with py7zr.SevenZipFile(self.path, mode="r") as zin:
+                members = [
+                    member
+                    for member in zin.list()
+                    if not member.is_directory
+                    and member.filename not in excluded
+                ]
                 targets = [f for f in zin.getnames() if f not in exclude_list]
-            with tempfile.NamedTemporaryFile(dir=os.path.dirname(self.path), delete=False) as tmp_file:
-                with py7zr.SevenZipFile(tmp_file.file, mode="w") as zout:
-                    with py7zr.SevenZipFile(self.path, mode="r") as zin:
-                        for filename, buffer in zin.read(targets).items():
-                            zout.writef(buffer, filename)
-
-                self.path.unlink(missing_ok=True)
-                tmp_file.close()  # Required on windows
-
-                shutil.move(tmp_file.name, self.path)
+                buffer_limit = max(
+                    (member.uncompressed or 0 for member in members),
+                    default=0,
+                ) + 1
+                
+                factory = BytesIOFactory(limit=buffer_limit)
+                
+                if targets:
+                    zin.extract(targets=targets, factory=factory)
+            with tempfile.NamedTemporaryFile(
+                dir=self.path.parent,
+                delete=False,
+            ) as tmp_file:
+                temp_path = pathlib.Path(tmp_file.name)
+            
+            with py7zr.SevenZipFile(temp_path, mode="W") as zout:
+                for filename in targets:
+                    buffer = factory.get(filename)
+                    buffer.seek(0)
+                    zout.writef(buffer, filename)
+            
+            os.replace(temp_path, self.path)
+            temp_path = None
+            return True
         except (py7zr.Bad7zFile, OSError) as e:
             logger.error("Error rebuilding 7zip file [%s]: %s", e, self.path)
             return False
-        return True
+        finally:
+            if temp_path is not None:
+                temp_path.unlink(missing_ok=True)
 
     def copy_from_archive(self, other_archive: UnknownArchiver) -> bool:
         """Replace the current zip with one copied from another archive"""
@@ -761,7 +802,11 @@ class ComicArchive:
         self.archiver.path = pathlib.Path(path)
 
     def sevenzip_test(self) -> bool:
-        return z7_support and py7zr.is_7zfile(self.path)
+        return (
+            z7_support
+            and self.path.is_file()
+            and py7zr.is_7zfile(self.path)
+        )
 
     def zip_test(self) -> bool:
         return zipfile.is_zipfile(self.path)
